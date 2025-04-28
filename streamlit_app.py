@@ -4,7 +4,7 @@ from openai import OpenAI
 st.title("💬 TokenAPI")
 st.write(
     "Este é um chatbot simples que usa o modelo GPT-4 da OpenAI para gerar respostas."
-    "Para usar este aplicativo, você precisa fornecer uma chave de API OpenAI, que você pode obter [aqui](https://platform.openai.com/account/api-keys).
+    "Para usar este aplicativo, você precisa fornecer uma chave de API OpenAI, que você pode obter [aqui](https://platform.openai.com/account/api-keys)."
    
 )
 
