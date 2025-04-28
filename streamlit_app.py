@@ -3,14 +3,14 @@ from openai import OpenAI
 
 st.title("💬 TokenAPI")
 st.write(
-    "This is a simple chatbot that uses OpenAI's GPT-4 model to generate responses. "
-    "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
+    "Este é um chatbot simples que usa o modelo GPT-4 da OpenAI para gerar respostas."
+    "Para usar este aplicativo, você precisa fornecer uma chave de API OpenAI, que você pode obter" [aqui](https://platform.openai.com/account/api-keys). "
    
 )
 
 openai_api_key = st.text_input("OpenAI API Key", type="password")
 if not openai_api_key:
-    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+    st.info("Adicione sua chave de API OpenAI para continuar.", icon="🗝️")
 else:
 
     client = OpenAI(api_key=openai_api_key)
@@ -24,14 +24,14 @@ else:
             st.markdown(message["content"])
 
  
-    if prompt := st.chat_input("What is up?"):
+    if prompt := st.chat_input("Pergunte alguma coisa"):
 
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
         stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": m["role"], "content": m["content"]}
                 for m in st.session_state.messages
