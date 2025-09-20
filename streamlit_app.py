@@ -5,7 +5,7 @@ import time
 st.set_page_config(page_title="Chatbot GPT", page_icon="💬", layout="wide")
 
 st.title("💬 Chatbot GPT")
-st.caption("Escolha seu modelo, converse e deixe a IA organizar os títulos das conversas!")
+st.caption("Escolha seu modelo e comece a usar!")
 
 # Sidebar com configurações
 with st.sidebar:
