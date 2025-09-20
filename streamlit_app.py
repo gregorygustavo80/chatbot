@@ -68,7 +68,7 @@ def gerar_titulo(client, model, primeira_mensagem):
 
 
 if not openai_api_key:
-    st.info("🔑 Por favor, adicione sua OpenAI API Key na barra lateral.", icon="🗝️")
+    st.info(" Por favor, adicione sua OpenAI API Key na barra lateral.", icon="🗝️")
 else:
     client = OpenAI(api_key=openai_api_key)
 
