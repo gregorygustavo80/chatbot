@@ -5,7 +5,7 @@ import time
 st.set_page_config(page_title="Chatbot GPT", page_icon="💬", layout="wide")
 
 st.title("💬 Chatbot GPT")
-st.caption("Escolha seu modelo, converse e deixe a IA organizar os títulos das conversas!")
+st.subheader("Escolha seu modelo e comece a usar!")
 
 # Sidebar com configurações
 with st.sidebar:
@@ -15,7 +15,6 @@ with st.sidebar:
 
     # Modelos organizados do menos potente para o mais potente
     available_models = [
-        "gpt-3",
         "gpt-3.5-turbo",
         "gpt-3.5-turbo-instruct",
         "gpt-4",
@@ -82,64 +81,47 @@ else:
     # Obtém a sessão atual
     messages = st.session_state.sessions[selected_session]
 
-    # Layout principal: duas colunas
-    col1, col2 = st.columns([1, 2])
+    # Exibe mensagens anteriores
+    for message in messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-    # Coluna da esquerda: histórico
-    with col1:
-        st.subheader("📜 Histórico")
-        if messages:
-            for m in messages:
-                role = "👤 Usuário" if m["role"] == "user" else "🤖 Assistente"
-                st.markdown(f"**{role}:** {m['content']}")
-        else:
-            st.write("Nenhuma mensagem nesta sessão ainda.")
+    # Campo de entrada do usuário
+    if prompt := st.chat_input("Digite sua mensagem:"):
+        messages.append({"role": "user", "content": prompt})
 
-    # Coluna da direita: conversa em tempo real
-    with col2:
-        st.subheader("💬 Conversa")
+        # Se for a primeira mensagem da sessão, IA gera título automaticamente
+        if len(messages) == 1:
+            titulo = gerar_titulo(client, model, prompt)
+            # Renomeia sessão no dicionário
+            st.session_state.sessions[titulo] = st.session_state.sessions.pop(selected_session)
+            st.session_state.current_session = titulo
+            selected_session = titulo
+            messages = st.session_state.sessions[selected_session]
 
-        # Exibe mensagens anteriores
-        for message in messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+        # Mostra a mensagem do usuário
+        with st.chat_message("user"):
+            st.markdown(prompt)
 
-        # Campo de entrada do usuário
-        if prompt := st.chat_input("Digite sua mensagem:"):
-            messages.append({"role": "user", "content": prompt})
+        try:
+            # Chamada streaming
+            stream = client.chat.completions.create(
+                model=model,
+                messages=[{"role": m["role"], "content": m["content"]} for m in messages],
+                stream=True,
+            )
 
-            # Se for a primeira mensagem da sessão, IA gera título automaticamente
-            if len(messages) == 1:
-                titulo = gerar_titulo(client, model, prompt)
-                # Renomeia sessão no dicionário
-                st.session_state.sessions[titulo] = st.session_state.sessions.pop(selected_session)
-                st.session_state.current_session = titulo
-                selected_session = titulo
-                messages = st.session_state.sessions[selected_session]
+            with st.chat_message("assistant"):
+                full_response = ""
+                message_placeholder = st.empty()
+                for chunk in stream:
+                    if chunk.choices[0].delta.content is not None:
+                        delta = chunk.choices[0].delta.content
+                        full_response += delta
+                        message_placeholder.markdown(full_response)
+                        time.sleep(0.01)  # efeito de digitação
 
-            # Mostra a mensagem do usuário
-            with st.chat_message("user"):
-                st.markdown(prompt)
+            messages.append({"role": "assistant", "content": full_response})
 
-            try:
-                # Chamada streaming
-                stream = client.chat.completions.create(
-                    model=model,
-                    messages=[{"role": m["role"], "content": m["content"]} for m in messages],
-                    stream=True,
-                )
-
-                with st.chat_message("assistant"):
-                    full_response = ""
-                    message_placeholder = st.empty()
-                    for chunk in stream:
-                        if chunk.choices[0].delta.content is not None:
-                            delta = chunk.choices[0].delta.content
-                            full_response += delta
-                            message_placeholder.markdown(full_response)
-                            time.sleep(0.01)  # efeito de digitação
-
-                messages.append({"role": "assistant", "content": full_response})
-
-            except Exception as e:
-                st.error(f"❌ Erro: {e}")
+        except Exception as e:
+            st.error(f"❌ Erro: {e}")
