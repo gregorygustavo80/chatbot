@@ -5,7 +5,7 @@ import time
 st.set_page_config(page_title="Chatbot GPT", page_icon="💬", layout="wide")
 
 st.title("💬 Chatbot GPT")
-st.caption("Escolha seu modelo e comece a usar!")
+st.caption("Escolha seu modelo, converse e deixe a IA organizar os títulos das conversas!")
 
 # Sidebar com configurações
 with st.sidebar:
@@ -31,8 +31,11 @@ with st.sidebar:
 
     # Selecionar sessão
     session_names = list(st.session_state.sessions.keys())
-    selected_session = st.selectbox("Escolha a sessão", session_names, 
-                                    index=session_names.index(st.session_state.current_session))
+    selected_session = st.selectbox(
+        "Escolha a sessão",
+        session_names,
+        index=session_names.index(st.session_state.current_session)
+    )
 
     # Criar nova sessão
     if st.button("➕ Nova sessão"):
@@ -68,7 +71,7 @@ def gerar_titulo(client, model, primeira_mensagem):
 
 
 if not openai_api_key:
-    st.info(" Por favor, adicione sua OpenAI API Key na barra lateral.", icon="🗝️")
+    st.info("🔑 Por favor, adicione sua OpenAI API Key na barra lateral.", icon="🗝️")
 else:
     client = OpenAI(api_key=openai_api_key)
 
@@ -126,10 +129,11 @@ else:
                     full_response = ""
                     message_placeholder = st.empty()
                     for chunk in stream:
-                        delta = chunk.choices[0].delta.get("content", "")
-                        full_response += delta
-                        message_placeholder.markdown(full_response)
-                        time.sleep(0.01)  # efeito de digitação
+                        if chunk.choices[0].delta.content is not None:
+                            delta = chunk.choices[0].delta.content
+                            full_response += delta
+                            message_placeholder.markdown(full_response)
+                            time.sleep(0.01)  # efeito de digitação
 
                 messages.append({"role": "assistant", "content": full_response})
 
