@@ -112,6 +112,11 @@ else:
                     *[{"role": m["role"], "content": m["content"]} for m in messages],
                 ],
                 stream=True,
+                max_tokens=800,
+                temperature=0.7,
+                top_p=0.9,
+                frequency_penalty=0,
+                presence_penalty=0
             )
 
             with st.chat_message("assistant"):
