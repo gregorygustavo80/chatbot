@@ -29,20 +29,20 @@ with st.sidebar:
 
     # Inicializa sessões
     if "sessions" not in st.session_state:
-        st.session_state.sessions = {"Sessão 1": []}
-        st.session_state.current_session = "Sessão 1"
+        st.session_state.sessions = {"": []}
+        st.session_state.current_session = ""
 
     # Selecionar sessão
     session_names = list(st.session_state.sessions.keys())
     selected_session = st.selectbox(
-        "Escolha a sessão",
+        "Chats",
         session_names,
         index=session_names.index(st.session_state.current_session)
     )
 
     # Criar nova sessão
-    if st.button("➕ Nova sessão"):
-        new_name = f"Sessão {len(st.session_state.sessions)+1}"
+    if st.button("➕ Novo chat"):
+        new_name = f"chat {len(st.session_state.sessions)+1}"
         st.session_state.sessions[new_name] = []
         st.session_state.current_session = new_name
         st.rerun()
@@ -55,14 +55,14 @@ with st.sidebar:
 # Função para gerar título automaticamente
 def gerar_titulo(client, model, primeira_mensagem):
     prompt_titulo = f"""
-    Crie um título curto (máx 5 palavras) para uma conversa cujo primeiro usuário disse:
+    Crie um título curto (máx 5 palavras) em português para uma conversa cujo primeiro usuário disse:
     '{primeira_mensagem}'
     """
     try:
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": "Você é um gerador de títulos curtos e descritivos."},
+                {"role": "system", "content": "Você é um gerador de títulos curtos e descritivos. Sempre responda em português do Brasil."},
                 {"role": "user", "content": prompt_titulo}
             ],
             max_tokens=20,
@@ -70,7 +70,7 @@ def gerar_titulo(client, model, primeira_mensagem):
         titulo = response.choices[0].message.content.strip()
         return titulo
     except:
-        return "Nova Sessão"
+        return "Novo chat"
 
 
 if not openai_api_key:
@@ -107,7 +107,10 @@ else:
             # Chamada streaming
             stream = client.chat.completions.create(
                 model=model,
-                messages=[{"role": m["role"], "content": m["content"]} for m in messages],
+                messages=[
+                    {"role": "system", "content": "Você é um assistente útil que SEMPRE responde em português do Brasil, de forma clara e natural."},
+                    *[{"role": m["role"], "content": m["content"]} for m in messages],
+                ],
                 stream=True,
             )
 
