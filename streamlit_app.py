@@ -50,7 +50,11 @@ with st.sidebar:
     # Botão para limpar histórico da sessão atual
     if st.button("🗑️ Limpar histórico"):
         st.session_state.sessions[selected_session] = []
-
+        
+    if st.button("🗑️ Limpar todas as sessões"):
+        st.session_state.sessions = {"": []}  # cria um dicionário vazio com uma sessão padrão
+        st.session_state.current_session = ""
+        st.rerun()  # para atualizar imediatamente o app
 
 # Função para gerar título automaticamente
 def gerar_titulo(client, model, primeira_mensagem):
@@ -111,12 +115,7 @@ else:
                     {"role": "system", "content": "Você é um assistente útil que SEMPRE responde em português do Brasil, de forma clara e natural."},
                     *[{"role": m["role"], "content": m["content"]} for m in messages],
                 ],
-                stream=True,
-                max_tokens=800,
-                temperature=0.7,
-                top_p=0.9,
-                frequency_penalty=0,
-                presence_penalty=0
+                stream=True,         
             )
 
             with st.chat_message("assistant"):
