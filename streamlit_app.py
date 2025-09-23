@@ -48,10 +48,10 @@ with st.sidebar:
         st.rerun()
 
     # Botão para limpar histórico da sessão atual
-    if st.button("🗑️ Limpar histórico"):
+    if st.button("🗑️ Limpar página"):
         st.session_state.sessions[selected_session] = []
         
-    if st.button("🗑️ Limpar todas as sessões"):
+    if st.button("🗑️ Excluir todos os chats"):
         st.session_state.sessions = {"": []}  # cria um dicionário vazio com uma sessão padrão
         st.session_state.current_session = ""
         st.rerun()  # para atualizar imediatamente o app
