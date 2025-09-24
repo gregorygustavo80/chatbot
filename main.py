@@ -16,12 +16,9 @@ with st.sidebar:
     # Modelos organizados do menos potente para o mais potente
     available_models = [
         "gpt-3.5-turbo",
-        "gpt-3.5-turbo-instruct",
         "gpt-4",
-        "gpt-4-32k",
         "gpt-4o",
         "gpt-4-turbo",
-        "gpt-4-turbo-32k",
         "gpt-4.1",
         "gpt-5"
     ]
