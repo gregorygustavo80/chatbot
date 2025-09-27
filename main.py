@@ -49,9 +49,9 @@ with st.sidebar:
         st.session_state.sessions[selected_session] = []
         
     if st.button("🗑️ Excluir todos os chats"):
-        st.session_state.sessions = {"": []}  # cria um dicionário vazio com uma sessão padrão
+        st.session_state.sessions = {"": []}
         st.session_state.current_session = ""
-        st.rerun()  # para atualizar imediatamente o app
+        st.rerun()
 
 # Função para gerar título automaticamente
 def gerar_titulo(client, model, primeira_mensagem):
@@ -73,7 +73,6 @@ def gerar_titulo(client, model, primeira_mensagem):
     except:
         return "Novo chat"
 
-
 if not openai_api_key:
     st.info(" Por favor, adicione sua OpenAI API Key na barra lateral.", icon="🗝️")
 else:
@@ -87,14 +86,29 @@ else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
+    # --- Botão de upload de arquivo ---
+    uploaded_file = st.file_uploader("📎 Adicionar arquivos:", type=["txt", "pdf", "csv", "docx", "mp3", "mp4" "wav", "opus"])
+    file_content = ""
+    if uploaded_file:
+        file_content = uploaded_file.read()
+        st.info(f"Arquivo '{uploaded_file.name}' carregado com sucesso!")
+
     # Campo de entrada do usuário
     if prompt := st.chat_input("Digite sua mensagem:"):
+        # Se houver arquivo, anexa o conteúdo à mensagem
+        if uploaded_file:
+            try:
+                # Tenta decodificar como texto
+                file_text = file_content.decode('utf-8', errors='ignore')
+            except:
+                file_text = "<conteúdo binário não exibido>"
+            prompt = f"{prompt}\n\nConteúdo do arquivo:\n{file_text}"
+
         messages.append({"role": "user", "content": prompt})
 
         # Se for a primeira mensagem da sessão, IA gera título automaticamente
         if len(messages) == 1:
             titulo = gerar_titulo(client, model, prompt)
-            # Renomeia sessão no dicionário
             st.session_state.sessions[titulo] = st.session_state.sessions.pop(selected_session)
             st.session_state.current_session = titulo
             selected_session = titulo
@@ -112,7 +126,7 @@ else:
                     {"role": "system", "content": "Você é um assistente útil que SEMPRE responde em português do Brasil, de forma clara e natural."},
                     *[{"role": m["role"], "content": m["content"]} for m in messages],
                 ],
-                stream=True,         
+                stream=True,
             )
 
             with st.chat_message("assistant"):
@@ -123,7 +137,7 @@ else:
                         delta = chunk.choices[0].delta.content
                         full_response += delta
                         message_placeholder.markdown(full_response)
-                        time.sleep(0.01)  # efeito de digitação
+                        time.sleep(0.01)
 
             messages.append({"role": "assistant", "content": full_response})
 
