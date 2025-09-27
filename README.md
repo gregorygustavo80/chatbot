@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ````
 Execute o chatbot:
 ````
-python main.py
+streamlit run main.py
 ````
 ## 🛠️ Uso
 
