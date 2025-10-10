@@ -87,7 +87,7 @@ else:
             st.markdown(message["content"])
 
     # --- Botão de upload de arquivo ---
-    uploaded_file = st.file_uploader("📎 Adicionar arquivos:", type=["txt", "pdf", "csv", "docx", "mp3", "mp4" "wav", "opus"])
+    uploaded_file = st.file_uploader("📎 Adicionar arquivos:", type=["txt", "pdf", "csv", "docx", "mp3", "mp4" "wav", "opus", "png"])
     file_content = ""
     if uploaded_file:
         file_content = uploaded_file.read()
